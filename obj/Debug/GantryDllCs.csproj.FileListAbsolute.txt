@@ -1,0 +1,6 @@
+C:\Users\runnanli\Desktop\Kane Runnan\Runnan_Program\CS test\GantryDllCs\GantryDllCs\bin\Debug\GantryDllCs.dll
+C:\Users\runnanli\Desktop\Kane Runnan\Runnan_Program\CS test\GantryDllCs\GantryDllCs\bin\Debug\GantryDllCs.pdb
+C:\Users\runnanli\Desktop\Kane Runnan\Runnan_Program\CS test\GantryDllCs\GantryDllCs\obj\Debug\GantryDllCs.csprojResolveAssemblyReference.cache
+C:\Users\runnanli\Desktop\Kane Runnan\Runnan_Program\CS test\GantryDllCs\GantryDllCs\obj\Debug\GantryDllCs.csproj.CoreCompileInputs.cache
+C:\Users\runnanli\Desktop\Kane Runnan\Runnan_Program\CS test\GantryDllCs\GantryDllCs\obj\Debug\GantryDllCs.dll
+C:\Users\runnanli\Desktop\Kane Runnan\Runnan_Program\CS test\GantryDllCs\GantryDllCs\obj\Debug\GantryDllCs.pdb

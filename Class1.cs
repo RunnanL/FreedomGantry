@@ -16,10 +16,18 @@ namespace GantryDllCs
         public double ratio = 2.0 / 400;
         public int ComStatus = 0;
         private List<string> PosTranslateBuffer = new List<string>();
+        public StateMachine States = new StateMachine();
 
         public string DllVersion()
         {
-            return "V1.1.0";
+            return "V1.1.1";
+        }
+
+        public struct StateMachine
+        {
+            public int XPositioningMode;
+            public int YPositioningMode;
+            public int ZPositioningMode;
         }
 
         public int GantryComConnect(string ComPort)
@@ -135,9 +143,10 @@ namespace GantryDllCs
                             var Buf2 = Buf1[1].Split('u');
                             string Cmd = "#1D" + Buf2[0];
                             Com_W_R(Cmd);
+                            States.XPositioningMode = 2;
                             return 1;
                         }
-                        else return 0;
+                        else { States.XPositioningMode = 0; return 0; }
                     }
                 case 2:
                     {
@@ -148,9 +157,10 @@ namespace GantryDllCs
                             var Buf2 = Buf1[1].Split('u');
                             string Cmd = "#2D" + Buf2[0];
                             Com_W_R(Cmd);
+                            States.YPositioningMode = 2;
                             return 1;
                         }
-                        else return 0;
+                        else { States.YPositioningMode = 0; return 0; }
                     }
                 case 3:
                     {
@@ -161,12 +171,13 @@ namespace GantryDllCs
                             var Buf2 = Buf1[1].Split('u');
                             string Cmd = "#3D" + Buf2[0];
                             Com_W_R(Cmd);
+                            States.ZPositioningMode = 2;
                             return 1;
                         }
-                        else return 0;
+                        else { States.ZPositioningMode = 0; return 0; }
                     }
                 default:
-                    { return 0; }
+                    { States.XPositioningMode = 0; States.YPositioningMode = 0; States.ZPositioningMode = 0; return 0; }
             }
         }
 
@@ -272,13 +283,171 @@ namespace GantryDllCs
             Cy = 0.0;
             Cz = 0.0;
             Pos(ref Cx, ref Cy, ref Cz);
-            int Dx = Convert.ToInt32(Cx/ratio);
+            int Dx = Convert.ToInt32(Cx / ratio);
             int Dy = Convert.ToInt32(Cy / ratio);
             int Dz = Convert.ToInt32(Cz / ratio);
             Com_W_R("#1D" + Dx + "#2D" + Dy + "#3D" + Dz);
             Com_W_R("#1s" + Dx + "#2s" + Dy + "#3s" + Dz);
             Com_W_R("#1>1#2>1#3>1");
             return 1;
+        }
+
+        public int RelativeModeXYZ()
+        {
+            try
+            {
+                Com_W_R("#1p1");
+                if("p+1" == ReadBuffer[1].ToString() + ReadBuffer[2].ToString() + ReadBuffer[3].ToString())
+                {
+                    States.XPositioningMode = 1;
+                }
+            }
+            catch { return 0; }
+            try
+            {
+                Com_W_R("#2p1");
+                if("p+1" == ReadBuffer[1].ToString() + ReadBuffer[2].ToString() + ReadBuffer[3].ToString())
+                {
+                    States.YPositioningMode = 1;
+                }
+            }
+            catch { return 0; }
+            try
+            {
+                Com_W_R("#3p1");
+                if ("p+1" == ReadBuffer[1].ToString() + ReadBuffer[2].ToString() + ReadBuffer[3].ToString())
+                {
+                    States.ZPositioningMode = 1;
+                }
+            }
+            catch { return 0; }
+
+            return 1;
+        }
+
+        public int AbsoluteModeXYZ()
+        {
+            try
+            {
+                Com_W_R("#1p2");
+                if ("p+2" == ReadBuffer[1].ToString() + ReadBuffer[2].ToString() + ReadBuffer[3].ToString())
+                {
+                    States.XPositioningMode = 2;
+                }
+            }
+            catch { return 0; }
+            try
+            {
+                Com_W_R("#2p2");
+                if ("p+2" == ReadBuffer[1].ToString() + ReadBuffer[2].ToString() + ReadBuffer[3].ToString())
+                {
+                    States.YPositioningMode = 2;
+                }
+            }
+            catch { return 0; }
+            try
+            {
+                Com_W_R("#3p2");
+                if ("p+2" == ReadBuffer[1].ToString() + ReadBuffer[2].ToString() + ReadBuffer[3].ToString())
+                {
+                    States.ZPositioningMode = 2;
+                }
+            }
+            catch { return 0; }
+
+            return 1;
+        }
+
+        public int MoveRelativeX(double DistanceMm)
+        {
+            int Code = 0;
+            int Xstp = Convert.ToInt32(DistanceMm / ratio);
+            Code = Com_W_R("#1s"+Xstp);
+            if (1 == Code)
+            {
+                Code = Com_W_R("#1A");
+                if (1 == Code)
+                {
+                    return 1;
+                }
+                else { return 0; }
+            }
+            else { return 0; }
+        }
+
+        public int MoveRelativeY(double DistanceMm)
+        {
+            int Code = 0;
+            int Ystp = Convert.ToInt32(DistanceMm / ratio);
+            Code = Com_W_R("#2s" + Ystp);
+            if (1 == Code)
+            {
+                Code = Com_W_R("#2A");
+                if (1 == Code)
+                {
+                    return 1;
+                }
+                else { return 0; }
+            }
+            else { return 0; }
+        }
+
+        public int MoveRelativeZ(double DistanceMm)
+        {
+            int Code = 0;
+            int Zstp = Convert.ToInt32(DistanceMm / ratio);
+            Code = Com_W_R("#3s" + Zstp);
+            if (1 == Code)
+            {
+                Code = Com_W_R("#3A");
+                if (1 == Code)
+                {
+                    return 1;
+                }
+                else { return 0; }
+            }
+            else { return 0; }
+        }
+
+        public int Calibrate(double CalX, double CalY, double CalZ)
+        {
+            try
+            {
+                int X = Convert.ToInt32(CalX / ratio);
+                int Y = Convert.ToInt32(CalY / ratio);
+                int Z = Convert.ToInt32(CalZ / ratio);
+                int Code = 0;
+
+                Code = Com_W_R("#1D" + X.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#1s" + X.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#1p2" + X.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#1>1");
+                if (0 == Code) { return 0; }
+
+                Code = Com_W_R("#2D" + Y.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#2s" + Y.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#2p2" + X.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#2>1");
+                if (0 == Code) { return 0; }
+
+                Code = Com_W_R("#3D" + Z.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#3s" + Z.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#3p2" + X.ToString());
+                if (0 == Code) { return 0; }
+                Code = Com_W_R("#3>1");
+                if (0 == Code) { return 0; }
+
+                return 1;
+            }
+            catch { return 0; }
         }
     }
 }

@@ -422,7 +422,7 @@ namespace GantryDllCs
                 if (0 == Code) { return 0; }
                 Code = Com_W_R("#1s" + X.ToString());
                 if (0 == Code) { return 0; }
-                Code = Com_W_R("#1p2" + X.ToString());
+                Code = Com_W_R("#1p2");
                 if (0 == Code) { return 0; }
                 Code = Com_W_R("#1>1");
                 if (0 == Code) { return 0; }
@@ -431,7 +431,7 @@ namespace GantryDllCs
                 if (0 == Code) { return 0; }
                 Code = Com_W_R("#2s" + Y.ToString());
                 if (0 == Code) { return 0; }
-                Code = Com_W_R("#2p2" + X.ToString());
+                Code = Com_W_R("#2p2");
                 if (0 == Code) { return 0; }
                 Code = Com_W_R("#2>1");
                 if (0 == Code) { return 0; }
@@ -440,7 +440,7 @@ namespace GantryDllCs
                 if (0 == Code) { return 0; }
                 Code = Com_W_R("#3s" + Z.ToString());
                 if (0 == Code) { return 0; }
-                Code = Com_W_R("#3p2" + X.ToString());
+                Code = Com_W_R("#3p2");
                 if (0 == Code) { return 0; }
                 Code = Com_W_R("#3>1");
                 if (0 == Code) { return 0; }
